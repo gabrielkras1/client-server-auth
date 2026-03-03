@@ -1,18 +1,21 @@
 // Função principal que simula o cliente
 async function autenticar() {
 
-    // Dados do usuário
-    const dados = {
-        id: "1",
-        login: "kras",
-        senha: "gabriel",
-        token: ""
+    let dadosValidar = 
+    {
+        tipoAutenticacao: "token",
+        dados: {
+            id: "1",
+            login: "user",
+            senha: "1234",
+            token: "ndt9n6p2vie"
+        }
     };
 
-    console.log("Primeira tentativa...");
+    console.log("\nValidando token...");
 
     // Primeira requisição
-    let resposta = await fetch("http://localhost:3000/auth", {
+    let resposta = await fetch("http://localhost:3000/dados", {
 
         method: "POST",
 
@@ -20,7 +23,7 @@ async function autenticar() {
             "Content-Type": "application/json"
         },
 
-        body: JSON.stringify(dados)
+        body: JSON.stringify(dadosValidar)
 
     });
 
@@ -29,14 +32,16 @@ async function autenticar() {
     console.log("Resposta servidor:", resultado);
 
     // Se servidor retornou token
-    if (resultado.status === "token_inexistente") {
+    if (resultado.status === "TOKEN_INEXISTENTE") 
+    {
+        dadosValidar.tipoAutenticacao = "login"
 
-        console.log("Segunda tentativa com token...");
+        console.log("\nValidando login e senha...");
 
-        // Atualiza token
-        dados.token = resultado.token;
+        //Atualiza token
+        // dados.token = resultado.token.token;
 
-        resposta = await fetch("http://localhost:3000/auth", {
+        resposta = await fetch("http://localhost:3000/dados", {
 
             method: "POST",
 
@@ -44,13 +49,15 @@ async function autenticar() {
                 "Content-Type": "application/json"
             },
 
-            body: JSON.stringify(dados)
+            body: JSON.stringify(dadosValidar)
 
         });
 
         resultado = await resposta.json();
 
         console.log("Resposta servidor:", resultado);
+
+        dadosValidar.dados.token = resultado.token;
 
     }
 
